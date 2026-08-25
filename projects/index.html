@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projects / Danila Maksimov</title>
+<meta name="description" content="Data science and quantitative finance projects by Danila Maksimov.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="mark" href="../index.html">DM ///</a>
+    <div class="navlinks">
+      <a href="../index.html#work" class="current">Work</a>
+      <a href="../resume.html">Resume</a>
+      <a href="../index.html#about">Info</a>
+      <a href="https://github.com/dvnzil">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Projects</p>
+    <h1 style="font-size:clamp(2.2rem,5.5vw,3.4rem)">Selected work</h1>
+    <p class="lede">Three projects in risk modeling, classification, and macroeconomic
+      analysis. Each page states what I expected, what the data said instead, and where the
+      result stops holding.</p>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+
+    <a class="project" href="stock-downside-risk.html">
+      <div class="tags">2026 &middot; Risk modeling &middot; Python</div>
+      <h2>Predicting the Unknown Drop</h2>
+      <p>How far can a stock fall over five days, and is that visible in advance? Momentum,
+        volatility, and fundamentals features across five large-cap tech names — where a
+        linear model beat both ensembles once the evaluation respected the arrow of time.</p>
+      <div class="ledger">
+        <span><span class="k">R&sup2;</span> <span class="v">0.49</span></span>
+        <span><span class="k">EVAL</span> <span class="v">TIME-AWARE SPLIT</span></span>
+        <span><span class="k">WINDOW</span> <span class="v neg">5-DAY DOWNSIDE</span></span>
+      </div>
+      <div class="rowlinks"><span>Read the write-up <span class="arrow">&rarr;</span></span></div>
+    </a>
+
+    <a class="project" href="credit-risk-classification.html">
+      <div class="tags">2026 &middot; Classification &middot; Python</div>
+      <h2>What Really Predicts Financial Default</h2>
+      <p>A model with 93% accuracy that caught 2% of defaulters. Diagnosing why, finding
+        that behavior predicts default better than financial position, and moving the
+        decision threshold until recall reached 50%.</p>
+      <div class="ledger">
+        <span><span class="k">RECALL</span> <span class="v">2% &rarr; 50%</span></span>
+        <span><span class="k">DEFAULT RATE</span> <span class="v neg">6.7%</span></span>
+        <span><span class="k">THRESHOLD</span> <span class="v">0.5 &rarr; 0.2</span></span>
+      </div>
+      <div class="rowlinks"><span>Read the write-up <span class="arrow">&rarr;</span></span></div>
+    </a>
+
+    <a class="project" href="russia-macro.html">
+      <div class="tags">1993&ndash;2030 &middot; Macro analysis</div>
+      <h2>Russia's Macroeconomic Evolution</h2>
+      <p>Inflation, growth, global GDP share, and external balance across the transition,
+        the commodity cycle, and the sanctions era — testing whether stabilization ever
+        converted into sustained economic weight.</p>
+      <div class="ledger">
+        <span><span class="k">SPAN</span> <span class="v">1993&ndash;2030</span></span>
+        <span><span class="k">SOURCE</span> <span class="v">IMF WEO</span></span>
+        <span><span class="k">SERIES</span> <span class="v">CPI &middot; GDP &middot; PPP &middot; CA</span></span>
+      </div>
+      <div class="rowlinks"><span>Read the write-up <span class="arrow">&rarr;</span></span></div>
+    </a>
+
+  </div>
+</section>
+
+<footer>
+  <div class="wrap" style="display:flex;justify-content:space-between;width:100%">
+    <span>DM / 2026</span>
+    <a href="../index.html">Home &#8592;</a>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -28,9 +28,9 @@
   <div class="wrap">
     <p class="kicker">Risk modeling &middot; 2026</p>
     <h1>Predicting the Unknown Drop</h1>
-    <p class="standfirst">Are short-term stock drops unpredictable, or do measurable signals appear before downside risk rises? Modeling the magnitude of five-day downside risk for AAPL, MSFT, NVDA, GOOG, and AMZN — and finding that a linear model beat both ensembles tested against it.</p>
+    <p class="standfirst">Are short-term stock drops unpredictable, or do measurable signals appear before downside risk rises? Modeling the magnitude of five-day downside risk for AAPL, MSFT, NVDA, GOOG, and AMZN — and finding that a linear model beat both ensembles once the evaluation respected the arrow of time.</p>
 
-    <div class="ledger"><span><span class="k">R&sup2;</span> <span class="v">0.526</span></span><span><span class="k">MEAN ERROR</span> <span class="v">&plusmn;1.4pp</span></span><span><span class="k">WINDOW</span> <span class="v neg">5-DAY DOWNSIDE</span></span><span><span class="k">STACK</span> <span class="v">Python &middot; pandas &middot; scikit-learn</span></span></div>
+    <div class="ledger"><span><span class="k">R&sup2;</span> <span class="v">0.49</span></span><span><span class="k">EVAL</span> <span class="v">TIME-AWARE SPLIT</span></span><span><span class="k">WINDOW</span> <span class="v neg">5-DAY DOWNSIDE</span></span><span><span class="k">STACK</span> <span class="v">Python &middot; pandas &middot; scikit-learn</span></span></div>
 
     <div class="rowlinks" style="margin-top:18px">
       <a href="https://github.com/dvnzil/Stock-Downside-Risk-Prediction" style="color:var(--signal);text-decoration:none">Repository &#8599;</a>
@@ -116,16 +116,30 @@
       <figcaption>Predicted vs. actual downside risk. The linear trend indicates the model tracked the size of the drop, not merely its direction.</figcaption>
     </figure>
 
-    <p>The best model reached an <strong>R&sup2; of 0.526</strong> — accounting for 52.6% of
-      the variance in short-term downside risk — with predictions typically landing within
-      <strong>1.4 percentage points</strong> of the realized figure. For a five-day forward
-      window on public technical indicators, that's a meaningful share of a quantity usually
-      described as unforecastable.</p>
+    <p>Under time-aware evaluation, the full-feature linear model explained
+      <strong>49% of the variance</strong> in short-term downside risk. For a five-day
+      forward window built on public technical indicators, that's a meaningful share of a
+      quantity usually described as unforecastable.</p>
 
     <figure>
       <img src="../assets/stock-04-model-comparison.png" alt="Table comparing model performance across algorithms and feature sets">
       <figcaption>Model comparison across algorithms and feature sets. Linear regression on the full feature set was the most reliable configuration tested.</figcaption>
     </figure>
+
+    <h2>How the models were split matters more than which model</h2>
+    <p>The comparison was run two ways: a random train/test split, and a time-based split
+      where the model trains only on earlier data and is tested on later data it has never
+      seen.</p>
+    <p>The distinction is not cosmetic. A random split lets the model train on Thursday and
+      test on Wednesday. In a price series where adjacent days are highly correlated, that
+      leaks future information backward — the model looks strong because it has effectively
+      seen the answer. A time-based split is the only version that resembles how the model
+      would actually be used: standing at a point in time, predicting forward.</p>
+    <p>Tree-based models degraded noticeably when moved from the random split to the
+      time-aware one. Linear regression held up. That gap is informative on its own: it
+      suggests the ensembles were fitting patterns specific to the sampled period rather
+      than a relationship that persists forward. The random-split numbers overstated them,
+      and the time-aware numbers are the ones reported here.</p>
 
     <h2>Why the simple model won</h2>
     <p>The result is worth sitting with rather than filing as a curiosity. A plausible
@@ -135,8 +149,8 @@
       less proportionally. There isn't an intricate interaction to find, so the models
       searching for one had nothing to gain and additional variance to lose.</p>
     <p>The ensembles had more capacity to fit noise in a dataset where most observations are
-      ordinary days. Extra flexibility is only an advantage when there's structure to
-      flex toward.</p>
+      ordinary days. Extra flexibility is only an advantage when there's structure to flex
+      toward — and under time-aware evaluation, the flexibility became a liability.</p>
     <p>The practical consequence is that the winning model is also the interpretable one.
       Each coefficient states how much forward downside risk moves per unit of its
       indicator. That is not a small thing when the output is meant to warn someone about
@@ -166,12 +180,14 @@
       across sectors and across a market dislocation is the obvious next step.</p>
 
     <h2>What I took from it</h2>
-    <p>Two things. First, that model complexity is a hypothesis about the data, not a
-      default setting — reaching for gradient boosting encodes a belief that the structure
-      is non-linear, and that belief should be tested rather than assumed. Second, that in a
-      financial context the interpretable model has value the accuracy metric doesn't
-      capture. A number a person can trace back to a cause is worth more than a marginally
-      better number they can't.</p>
+    <p>Three things. First, that the evaluation design can matter more than the model
+      choice — the ranking of these algorithms changed depending on how the data was split,
+      and only one of those splits corresponded to the real use case. Second, that model
+      complexity is a hypothesis about the data rather than a default setting: reaching for
+      gradient boosting encodes a belief that the structure is non-linear, and that belief
+      should be tested. Third, that in a financial context the interpretable model carries
+      value the accuracy metric doesn't capture — a number a person can trace back to a
+      cause is worth more than a marginally better number they can't.</p>
 
     <h2>Data and tooling</h2>
     <p>Price and fundamentals data via the Alpha Vantage API. Python, pandas, and
