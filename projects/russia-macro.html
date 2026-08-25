@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Russia's Macroeconomic Evolution / Danila Maksimov</title>
-<meta name="description" content="Russian macroeconomic data since 1993.">
+<title>Russia's Macroeconomic Evolution Since 1993 / Danila Maksimov</title>
+<meta name="description" content="Three decades of Russian inflation, growth, global share, and external balance.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -25,40 +25,134 @@
 
 <article class="post">
   <div class="wrap">
-    <p class="kicker">Macro analysis · 1993–present</p>
-    <h1>Russia's Macroeconomic Evolution</h1>
-    <p class="standfirst">
-      Three decades of output, inflation, and external balances — from the post-Soviet
-      transition through the commodity cycle to the sanctions era.
-    </p>
+    <p class="kicker">Macro analysis &middot; 1993&ndash;2030</p>
+    <h1>Russia's Macroeconomic Evolution Since 1993</h1>
+    <p class="standfirst">From post-Soviet instability to stabilization, and whether that stabilization ever converted into sustained economic weight.</p>
 
-    <div class="ledger">
-      <span><span class="k">SPAN</span> <span class="v">1993–PRESENT</span></span>
-      <span><span class="k">SERIES</span> <span class="v">GDP · CPI · TRADE</span></span>
-      <span><span class="k">STACK</span> <span class="v">Python · pandas · Tableau</span></span>
-    </div>
+    <div class="ledger"><span><span class="k">SPAN</span> <span class="v">1993&ndash;2030</span></span><span><span class="k">SERIES</span> <span class="v">CPI &middot; GDP &middot; PPP SHARE &middot; CURRENT ACCT</span></span><span><span class="k">SOURCE</span> <span class="v">IMF WEO</span></span></div>
 
     <div class="rowlinks" style="margin-top:18px">
-      <a href="https://github.com/dvnzil/Russia-Macroeconomic-Analysis" style="color:var(--signal);text-decoration:none">Repository ↗</a>
+      <a href="https://github.com/dvnzil/Russia-Macroeconomic-Analysis" style="color:var(--signal);text-decoration:none">Repository &#8599;</a>
     </div>
 
+
     <h2>The question</h2>
-    <p>PASTE FROM WIX. What problem you set out to answer and why it matters.</p>
+    <p>How did Russia move from post-Soviet macroeconomic instability to relative stability,
+      and how did its position in the global economy change across the major shocks from
+      1993 to the present?</p>
+    <p>Macroeconomic stability underwrites policy credibility, investment confidence, and a
+      country's resilience to external shocks. Russia is a useful case precisely because it
+      contains all three phases in one series: transition, recovery, and repeated exposure
+      to global shocks.</p>
 
     <h2>Data</h2>
-    <p>PASTE FROM WIX. Source, date range, universe of tickers, how you cleaned it.</p>
+    <p>IMF World Economic Outlook, annual data for Russia from 1993 through 2030, with
+      everything past 2026 flagged as projection rather than observation. Four variables:</p>
+    <ul>
+      <li><strong>Inflation (CPI, %)</strong> — monetary stability.</li>
+      <li><strong>Real GDP growth (%)</strong> — expansion or contraction.</li>
+      <li><strong>Share of world GDP (PPP, %)</strong> — weight in the global economy.</li>
+      <li><strong>Current account (% of GDP)</strong> — external balance and export strength.</li>
+    </ul>
+    <p>These are national annual aggregates. They carry no quarterly volatility, no
+      household-level outcomes, no inequality measures, and no political variables, and they
+      follow IMF definitions that get revised over time.</p>
 
-    <h2>The three eras</h2>
-    <p>PASTE FROM WIX. Transition, commodity boom, sanctions — what changed in the data at each break.</p>
+    <h2>Preparation</h2>
+    <p>The IMF export arrives split across sheets by indicator, so the first step was
+      consolidating it into a single time series frame: identifying year columns, reshaping
+      to long format, stripping footnote markers, special dashes, and other non-numeric
+      artifacts before casting to numeric, then merging indicators on year with outer joins
+      to preserve every available observation. Rows with no indicator data were dropped. No
+      imputation was needed — the four selected variables had complete annual coverage over
+      the window.</p>
+    <p>The series was constrained to 1993 onward to isolate the post-Soviet period, and kept
+      at annual frequency deliberately: the question is about structural change, not
+      cyclical movement.</p>
 
-    <h2>What the charts show</h2>
-    <p>PASTE FROM WIX. Embed your Tableau images here with <code>&lt;img src="../assets/macro-gdp.png"&gt;</code>.</p>
+    <h2>Inflation, 1993&ndash;2030</h2>
+    <figure>
+      <img src="../assets/russia-01-inflation-full.png" alt="Russian CPI inflation, 1993 to 2030, full scale">
+    </figure>
+    <figure>
+      <img src="../assets/russia-02-inflation-zoom.png" alt="Russian CPI inflation, zoomed to the post-2000 period">
+      <figcaption>Full range and zoomed view. The second chart is necessary — the transition-era figures are large enough to flatten everything after them into a single line.</figcaption>
+    </figure>
+    <p>The collapse from transition-era levels is the dominant feature. The 2000s carry
+      repeated inflation spikes tied to individual crises, but none approaches the systemic
+      instability of the 1990s. Russia moved from monetary disorder to something that
+      functions as stabilization.</p>
 
-    <h2>What it got wrong</h2>
-    <p>PASTE FROM WIX — or write it fresh. The limitations section is the one that makes a
-      reader trust the rest of the page.</p>
+    <h2>Real GDP growth</h2>
+    <figure>
+      <img src="../assets/russia-03-gdp-growth.png" alt="Russian real GDP growth, 1993 to 2030, with event markers">
+      <figcaption>Annual real GDP growth with vertical markers for major events.</figcaption>
+    </figure>
+    <p>Recovery through the 1990s, peaking around 2000, then clear contractions in 2008,
+      2020, and 2022 — each one a global or geopolitical shock landing on the domestic
+      economy. The projection period shows modest growth rather than any return to the
+      expansionary rates of the 2000s. Stabilization happened; sustained momentum didn't.</p>
 
-    <a class="backlink" href="../index.html#work">← All projects</a>
+    <h2>Share of world GDP (PPP)</h2>
+    <figure>
+      <img src="../assets/russia-04-world-gdp-share.png" alt="Russia's share of world GDP at PPP, 1993 to 2030">
+      <figcaption>Russia's weight in the global economy, with event markers.</figcaption>
+    </figure>
+    <p>A sharp drop through the transition, steady recovery through the 2000s, then
+      stabilization and decline after the 2014 sanctions. The 2021 peak reads as
+      post-COVID recovery rather than the start of an upward trend. The overall shape is
+      recovery followed by stagnation.</p>
+
+    <h2>Current account balance</h2>
+    <figure>
+      <img src="../assets/russia-05-current-account.png" alt="Russian current account balance as a percentage of GDP">
+      <figcaption>Current account as a share of GDP, 1993 to 2030.</figcaption>
+    </figure>
+    <p>Strong surpluses through the 2000s on export revenue, gradual decline after 2014, and
+      a large spike in 2022 followed by normalization in the projections. Notably, this
+      series does not track growth — external performance stayed strong through periods
+      when domestic growth did not.</p>
+
+    <h2>What the series say together</h2>
+    <p>The story starts in systemic instability: hyperinflation, repeated GDP contraction,
+      a falling share of world output. That phase is institutional failure and economic
+      transformation at the same time.</p>
+    <p>Around 2000 there's a structural break visible in all four series at once. Inflation
+      drops to low double and then single digits, growth turns positive and stays there,
+      and global share begins climbing. The 2008 financial crisis interrupts it — growth
+      goes negative, inflation rises — but the economy does not return to 1990s-style
+      instability.</p>
+    <p>After 2014 and the sanctions that followed the annexation of Crimea, the data shifts
+      to a slower path: more volatile growth, temporary inflation spikes, a declining share
+      of world GDP. The 2020 pandemic adds another contraction. In 2022 GDP contracts again
+      and inflation rises while the current account surges.</p>
+    <p>Domestically, Russia moved from instability to stabilization after 2000. That is
+      clear. Internationally, the stabilization did not convert into sustained economic
+      weight. Controlled inflation was not sufficient for long-run economic power, and large
+      current account surpluses did not imply sustained growth — the two decoupled.</p>
+
+    <h2>Limitations</h2>
+    <p>Annual national aggregates hide within-year volatility, regional variation, and
+      household welfare entirely. A stable macro environment says nothing on its own about
+      living standards or distribution.</p>
+    <p>IMF figures past 2026 are projections and will be revised. The analysis is
+      descriptive, not causal. Geopolitical events enter only indirectly, through their
+      macroeconomic traces, and only the largest ones are marked — plenty of smaller events
+      affect the intervening years without appearing here.</p>
+    <p>The finding I'd flag as most interesting: the scale of the inflation stabilization
+      after the 1990s. That drop in volatility reads as a credibility shift in the policy
+      framework. Yet the share of world GDP never returned to pre-transition proportions,
+      which points to a global repositioning that the domestic stabilization didn't undo.
+      A natural extension is comparing Russia against other post-Soviet or emerging
+      markets over the same window.</p>
+
+    <h2>Data and tooling</h2>
+    <p>IMF World Economic Outlook. Python and pandas for consolidation and cleaning. AI
+      tools were used to help restructure the multi-sheet IMF export into a single frame
+      and to debug the cleaning code. Variable selection, interpretation, and conclusions
+      are my own.</p>
+
+    <a class="backlink" href="../index.html#work">&#8592; All projects</a>
   </div>
 </article>
 

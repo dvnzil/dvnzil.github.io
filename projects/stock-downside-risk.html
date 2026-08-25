@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Predicting the Unknown Drop / Danila Maksimov</title>
-<meta name="description" content="Modeling short-term stock downside risk.">
+<meta name="description" content="Modeling short-term stock downside risk across five large-cap technology names.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -25,41 +25,87 @@
 
 <article class="post">
   <div class="wrap">
-    <p class="kicker">Risk modeling · 2026</p>
+    <p class="kicker">Risk modeling &middot; 2026</p>
     <h1>Predicting the Unknown Drop</h1>
-    <p class="standfirst">
-      Modeling short-term stock downside risk from technical signals — how far a name can
-      fall over a fixed horizon, and which features carry that signal.
-    </p>
+    <p class="standfirst">Are short-term stock drops unpredictable, or do measurable signals appear before downside risk rises? Modeling the magnitude of five-day downside risk for AAPL, MSFT, NVDA, GOOG, and AMZN.</p>
 
-    <div class="ledger">
-      <span><span class="k">R²</span> <span class="v">0.49</span></span>
-      <span><span class="k">HORIZON</span> <span class="v">REPLACE</span></span>
-      <span><span class="k">STACK</span> <span class="v">Python · pandas · scikit-learn</span></span>
-    </div>
+    <div class="ledger"><span><span class="k">R&sup2;</span> <span class="v">0.526</span></span><span><span class="k">MEAN ERROR</span> <span class="v">&plusmn;1.4pp</span></span><span><span class="k">WINDOW</span> <span class="v neg">5-DAY DOWNSIDE</span></span><span><span class="k">STACK</span> <span class="v">Python &middot; pandas &middot; scikit-learn</span></span></div>
 
     <div class="rowlinks" style="margin-top:18px">
-      <a href="https://github.com/dvnzil/Stock-Downside-Risk-Prediction" style="color:var(--signal);text-decoration:none">Repository ↗</a>
+      <a href="https://github.com/dvnzil/Stock-Downside-Risk-Prediction" style="color:var(--signal);text-decoration:none">Repository &#8599;</a>
     </div>
 
-    <h2>The question</h2>
-    <p>PASTE FROM WIX. What problem you set out to answer and why it matters.</p>
 
-    <h2>Data</h2>
-    <p>PASTE FROM WIX. Source, date range, universe of tickers, how you cleaned it.</p>
+    <h2>The anxiety of the unknown drop</h2>
+    <p>Most people treat the stock market as a guess about direction — up or down. For an
+      everyday investor, the sharper fear isn't a missed gain, it's the sudden decline that
+      erases months of savings. This project asks whether that decline is visible before it
+      happens.</p>
+    <p>The research question: are short-term stock drops genuinely unpredictable, or are
+      there measurable signals that appear before downside risk rises? We modeled the
+      magnitude of downside risk — the maximum percentage a stock might fall over a
+      five-day window — for five large-cap technology names: Apple, Microsoft, Nvidia,
+      Google, and Amazon.</p>
 
-    <h2>Features</h2>
-    <p>PASTE FROM WIX. RSI, Bollinger band width, price-to-moving-average ratio, and why
-      each one is plausibly informative about downside rather than direction.</p>
+    <figure>
+      <img src="../assets/stock-01-risk-distribution.png" alt="Distribution of daily returns, showing a left tail of sharp declines">
+      <figcaption>Most daily movements are small. The left tail holds the rare, sharp declines the model targets.</figcaption>
+    </figure>
 
-    <h2>Model and evaluation</h2>
-    <p>PASTE FROM WIX. What you fit, how you validated it, what the 49% actually refers to.</p>
+    <h2>Building the warning system</h2>
+    <p>Rather than watching price alone, we built a multivariate feature pipeline across
+      three families of signal:</p>
+    <ul>
+      <li><strong>Momentum</strong> — RSI and MACD, tracking how fast price is moving.</li>
+      <li><strong>Volatility</strong> — Bollinger Bands and rolling standard deviation, measuring instability.</li>
+      <li><strong>Fundamentals</strong> — quarterly earnings, testing whether company value supported the price.</li>
+    </ul>
 
-    <h2>What it got wrong</h2>
-    <p>PASTE FROM WIX — or write it fresh. The limitations section is the one that makes a
-      reader trust the rest of the page.</p>
+    <figure>
+      <img src="../assets/stock-02-feature-heatmap.png" alt="Correlation heatmap of engineered features against downside risk">
+      <figcaption>Feature correlation heatmap — which market signals track most closely with price drops.</figcaption>
+    </figure>
 
-    <a class="backlink" href="../index.html#work">← All projects</a>
+    <h2>Simplicity wins</h2>
+    <p>We tested two ensemble methods against a linear baseline. Random forest averages
+      hundreds of decision trees to stabilize its prediction. Gradient boosting builds
+      models in sequence, each one correcting the errors of the last.</p>
+    <p>Both were outperformed by linear regression. While the ensembles searched for
+      intricate interactions, a straight-line relationship between the technical indicators
+      and forward downside risk turned out to carry most of the available signal.</p>
+
+    <figure>
+      <img src="../assets/stock-03-predicted-vs-actual.png" alt="Scatter of predicted versus actual downside risk">
+      <figcaption>Predicted vs. actual downside risk. The linear trend indicates the model tracked drop magnitude, not just direction.</figcaption>
+    </figure>
+
+    <p>The best model reached an R&sup2; of 0.526 — accounting for 52.6% of the variance in
+      short-term downside risk — with predictions typically landing within 1.4 percentage
+      points of the realized figure.</p>
+
+    <figure>
+      <img src="../assets/stock-04-model-comparison.png" alt="Table comparing model performance across algorithms and feature sets">
+      <figcaption>Model comparison across algorithms and feature sets. Linear regression on the full feature set was the most reliable.</figcaption>
+    </figure>
+
+    <h2>Why the result matters</h2>
+    <p>Risk modeling of this kind usually sits inside a black box, where the reasoning
+      behind a prediction is invisible to the person affected by it. A transparent linear
+      model built on publicly available indicators — moving averages, RSI, volatility
+      bands, volume behavior — is a plausible blueprint for a warning-light system a retail
+      investor could actually inspect.</p>
+    <p>Two limits are worth stating plainly. First, a feedback loop: if enough investors act
+      on the same warning signal, the coordinated sell-off contributes to the decline the
+      model was built to anticipate. Second, information inequality: the code is open, but
+      the high-frequency data feeds needed to run this live are not cheap, which pushes the
+      practical benefit toward whoever can already afford the infrastructure.</p>
+
+    <h2>Data and tooling</h2>
+    <p>Price and fundamentals data via the Alpha Vantage API. Python, pandas, and
+      scikit-learn for feature engineering and modeling. AI tools were used for feature
+      engineering approaches and editing.</p>
+
+    <a class="backlink" href="../index.html#work">&#8592; All projects</a>
   </div>
 </article>
 

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>What Really Predicts Financial Default / Danila Maksimov</title>
-<meta name="description" content="A credit-risk classifier and what actually predicts default.">
+<meta name="description" content="A credit-risk classifier, class imbalance, and why the decision threshold mattered more than the model.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -25,40 +25,111 @@
 
 <article class="post">
   <div class="wrap">
-    <p class="kicker">Classification · 2026</p>
-    <h1>What Really Predicts Financial Default</h1>
-    <p class="standfirst">
-      A credit-risk classifier tuned to catch defaults rather than maximize accuracy on
-      an imbalanced dataset.
-    </p>
+    <p class="kicker">Classification &middot; 2026</p>
+    <h1>What Really Predicts Financial Default?</h1>
+    <p class="standfirst">A 93%-accurate model that caught 2% of defaulters. What went wrong, what actually signals risk, and why the decision threshold mattered more than the algorithm.</p>
 
-    <div class="ledger">
-      <span><span class="k">RECALL</span> <span class="v">0.50</span></span>
-      <span><span class="k">METRICS</span> <span class="v">PRECISION · ROC-AUC</span></span>
-      <span><span class="k">STACK</span> <span class="v">Python · pandas · scikit-learn</span></span>
-    </div>
+    <div class="ledger"><span><span class="k">RECALL</span> <span class="v">2% &rarr; 50%</span></span><span><span class="k">DEFAULT RATE</span> <span class="v neg">6.7%</span></span><span><span class="k">THRESHOLD</span> <span class="v">0.5 &rarr; 0.2</span></span><span><span class="k">STACK</span> <span class="v">Python &middot; scikit-learn</span></span></div>
 
     <div class="rowlinks" style="margin-top:18px">
-      <a href="https://github.com/dvnzil/What-Really-Predicts-Financial-Default-" style="color:var(--signal);text-decoration:none">Repository ↗</a>
+      <a href="https://github.com/dvnzil/What-Really-Predicts-Financial-Default-" style="color:var(--signal);text-decoration:none">Repository &#8599;</a>
     </div>
 
-    <h2>The question</h2>
-    <p>PASTE FROM WIX. What problem you set out to answer and why it matters.</p>
 
-    <h2>Data</h2>
-    <p>PASTE FROM WIX. Source, date range, universe of tickers, how you cleaned it.</p>
+    <h2>Why this question</h2>
+    <p>Working with Risk in Mind exposed me to how AI tools are used inside credit union
+      environments. Those institutions are constantly deciding who is risky, who might
+      default, and how early a warning sign can be caught before it becomes a loss. That
+      made the question concrete: what are these models actually keying on?</p>
 
-    <h2>Features</h2>
-    <p>PASTE FROM WIX. Which borrower attributes carried real signal and which dropped out.</p>
+    <h2>The question is deeper than it sounds</h2>
+    <p>"Can we predict default" is the easy version. A model will always produce
+      predictions. The harder question is what those predictions rest on.</p>
+    <p>Specifically: is default risk driven by a borrower's financial <em>position</em> —
+      income, debt ratio — or by their <em>behavior</em>, like repeated late payments and
+      heavy credit utilization? The distinction changes what an institution can do about it.
+      If risk is positional, it looks fixed. If it's behavioral, warning signs accumulate
+      over time and can be caught early.</p>
 
-    <h2>Model and evaluation</h2>
-    <p>PASTE FROM WIX. Model choice, threshold tuning, and the recall/precision trade-off you settled on.</p>
+    <h2>Accuracy was misleading</h2>
+    <p>The baseline model scored roughly 93% accuracy. It also caught 32 of 1,983 actual
+      defaulters — a recall of about 2%.</p>
+    <p>The dataset explains it: only 6.7% of individuals default. A model can score high on
+      accuracy by predicting "no default" almost every time and being right by construction.</p>
 
-    <h2>What it got wrong</h2>
-    <p>PASTE FROM WIX — or write it fresh. The limitations section is the one that makes a
-      reader trust the rest of the page.</p>
+    <figure>
+      <img src="../assets/credit-01-class-imbalance.png" alt="Class distribution showing 6.7 percent default rate">
+      <figcaption>6.7% of borrowers default. That imbalance is what lets a useless model look accurate.</figcaption>
+    </figure>
 
-    <a class="backlink" href="../index.html#work">← All projects</a>
+    <p>This was the turning point. A model can appear strong while failing at the one task
+      that matters. For a lender, missing most defaulters is the expensive error, whatever
+      the headline accuracy says.</p>
+
+    <h2>What actually signals risk</h2>
+    <p>I expected income and debt ratio to dominate. They didn't. The models consistently
+      pointed at behavioral variables — borrowers with more frequent late payments and
+      higher credit utilization were far more likely to default, and the pattern was much
+      cleaner than anything the financial variables produced.</p>
+
+    <figure>
+      <img src="../assets/credit-02-correlation-heatmap.png" alt="Correlation heatmap of borrower attributes against default">
+      <figcaption>The late-payment variables correlate heavily with each other — they measure the same behavior — so they were aggregated into a single total. Income and debt ratio show weak correlation with default.</figcaption>
+    </figure>
+
+    <p>In the decision tree, close to 80% of split importance came from past late payments
+      alone, with most of the remainder from credit utilization. Income and debt ratio
+      contributed little.</p>
+
+    <h2>Comparing models</h2>
+    <p>Three models, same data: logistic regression as an interpretable baseline, then a
+      decision tree and a random forest. At the default threshold, logistic regression
+      recovered about 2% of defaulters, the decision tree about 15%, the random forest
+      about 18%.</p>
+
+    <figure>
+      <img src="../assets/credit-03-model-comparison.png" alt="Recall comparison across logistic regression, decision tree, and random forest">
+      <figcaption>Recall by model. Logistic regression effectively fails to identify defaulters; the tree-based models do better but still miss most of them.</figcaption>
+    </figure>
+
+    <h2>The threshold changes everything</h2>
+    <p>The remaining gap was less about model choice than about the decision threshold. The
+      default cutoff is 0.5 — flag only borrowers scoring above 50%. On imbalanced data,
+      almost nobody clears that bar, so almost nobody gets flagged.</p>
+    <p>Dropping the threshold to 0.2 moved decision tree and random forest recall to roughly
+      50% — from missing most defaulters to catching half of them. Logistic regression
+      barely moved, which says something about its ability to separate the classes at all.</p>
+
+    <figure>
+      <img src="../assets/credit-04-precision-recall.png" alt="Precision-recall trade-off curve">
+      <figcaption>The precision-recall trade-off. Catching more defaulters means misclassifying more non-defaulters — expected on imbalanced data, and the same shape held across all three models.</figcaption>
+    </figure>
+
+    <h2>What the trade-off means for a lender</h2>
+    <p>Missing a defaulter costs money directly: unpaid loans, charge-offs, higher reserve
+      requirements. Flagging a non-defaulter costs review time. Those are not symmetric.</p>
+    <p>A flag isn't a rejection — it's a trigger for adjusted loan terms, reduced exposure,
+      or an extra check before approval. That asymmetry is why recall is the metric worth
+      optimizing here, and why the 0.2 threshold is defensible despite the precision it
+      gives up.</p>
+
+    <h2>What I took away</h2>
+    <p>The evaluation metric has to match the actual objective. Accuracy gave false
+      confidence on imbalanced data; recall and ROC-AUC described what the model was really
+      doing. And a model being technically correct is not the same as it being useful — the
+      93% figure was accurate and worthless simultaneously.</p>
+    <p>I also started with the wrong prior. Financial position felt like the obvious
+      predictor of risk, and behavior turned out to matter more. Risk here is less a
+      snapshot of someone's situation than a pattern that develops over time.</p>
+
+    <h2>Data and tooling</h2>
+    <p>The <a href="https://www.kaggle.com/competitions/GiveMeSomeCredit" style="color:var(--signal)">Give Me Some Credit</a>
+      dataset from Kaggle, predicting probability of financial distress over a two-year
+      window. Python with pandas, NumPy, matplotlib, and scikit-learn. AI tools were used
+      for code cleanup, debugging, and understanding random forests, which I hadn't worked
+      with before.</p>
+
+    <a class="backlink" href="../index.html#work">&#8592; All projects</a>
   </div>
 </article>
 

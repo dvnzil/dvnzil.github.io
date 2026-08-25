@@ -98,3 +98,8 @@ article.post img{max-width:100%;height:auto;border:1px solid var(--rule);margin:
 article.post figcaption{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:-14px}
 article.post code{font-family:var(--mono);font-size:.9em;background:#F2F0EA;padding:2px 5px}
 .backlink{font-family:var(--mono);font-size:12.5px;text-decoration:none;color:var(--signal);display:inline-block;margin:40px 0 72px}
+article.post figure{margin:28px 0}
+article.post figure img{margin:0 0 10px}
+article.post ul{max-width:66ch;padding-left:20px}
+article.post ul li{margin-bottom:8px}
+article.post a{color:var(--signal)}

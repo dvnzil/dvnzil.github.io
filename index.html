@@ -48,13 +48,13 @@
     <a class="project" href="projects/stock-downside-risk.html">
       <div class="tags">2026 · Risk modeling · Python</div>
       <h2>Predicting the Unknown Drop</h2>
-      <p>Short-term stock downside risk modeled from technical signals — RSI, Bollinger
-        band width, and price-to-moving-average ratios — to estimate how far a name can
-        fall over a fixed horizon.</p>
+      <p>How far can a stock fall over five days, and is that visible in advance? Momentum,
+        volatility, and fundamentals features across five large-cap tech names — where a
+        linear model beat both ensembles tested against it.</p>
       <div class="ledger">
-        <span><span class="k">R²</span> <span class="v">0.49</span></span>
-        <span><span class="k">TARGET</span> <span class="v neg">DOWNSIDE RISK</span></span>
-        <span><span class="k">STACK</span> <span class="v">pandas · scikit-learn</span></span>
+        <span><span class="k">R²</span> <span class="v">0.526</span></span>
+        <span><span class="k">MEAN ERROR</span> <span class="v">±1.4pp</span></span>
+        <span><span class="k">WINDOW</span> <span class="v neg">5-DAY DOWNSIDE</span></span>
       </div>
       <div class="rowlinks"><span>Read the write-up <span class="arrow">→</span></span></div>
     </a>
@@ -62,27 +62,27 @@
     <a class="project" href="projects/credit-risk-classification.html">
       <div class="tags">2026 · Classification · Python</div>
       <h2>What Really Predicts Financial Default</h2>
-      <p>A credit-risk classifier evaluated on recall, precision, ROC-AUC, and confusion
-        matrices, with threshold tuning aimed at catching defaults rather than maximizing
-        raw accuracy on an imbalanced set.</p>
+      <p>A model with 93% accuracy that caught 2% of defaulters. Diagnosing why, finding
+        that behavior predicts default better than financial position, and moving the
+        decision threshold until recall reached 50%.</p>
       <div class="ledger">
-        <span><span class="k">RECALL</span> <span class="v">0.50</span></span>
-        <span><span class="k">CLASS BALANCE</span> <span class="v neg">IMBALANCED</span></span>
-        <span><span class="k">STACK</span> <span class="v">pandas · scikit-learn</span></span>
+        <span><span class="k">RECALL</span> <span class="v">2% → 50%</span></span>
+        <span><span class="k">DEFAULT RATE</span> <span class="v neg">6.7%</span></span>
+        <span><span class="k">THRESHOLD</span> <span class="v">0.5 → 0.2</span></span>
       </div>
       <div class="rowlinks"><span>Read the write-up <span class="arrow">→</span></span></div>
     </a>
 
     <a class="project" href="projects/russia-macro.html">
-      <div class="tags">1993–present · Macro analysis</div>
+      <div class="tags">1993–2030 · Macro analysis</div>
       <h2>Russia's Macroeconomic Evolution</h2>
-      <p>Three decades of Russian macro data — output, inflation, and external balances —
-        traced through the post-Soviet transition, the commodity cycle, and the sanctions
-        era.</p>
+      <p>Inflation, growth, global GDP share, and external balance across the transition,
+        the commodity cycle, and the sanctions era — testing whether stabilization ever
+        converted into sustained economic weight.</p>
       <div class="ledger">
-        <span><span class="k">SPAN</span> <span class="v">30+ YRS</span></span>
-        <span><span class="k">FOCUS</span> <span class="v">GDP · INFLATION · TRADE</span></span>
-        <span><span class="k">STACK</span> <span class="v">pandas · Tableau</span></span>
+        <span><span class="k">SPAN</span> <span class="v">1993–2030</span></span>
+        <span><span class="k">SOURCE</span> <span class="v">IMF WEO</span></span>
+        <span><span class="k">SERIES</span> <span class="v">CPI · GDP · PPP · CA</span></span>
       </div>
       <div class="rowlinks"><span>Read the write-up <span class="arrow">→</span></span></div>
     </a>
