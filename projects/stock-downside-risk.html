@@ -27,7 +27,7 @@
   <div class="wrap">
     <p class="kicker">Risk modeling &middot; 2026</p>
     <h1>Predicting the Unknown Drop</h1>
-    <p class="standfirst">Are short-term stock drops unpredictable, or do measurable signals appear before downside risk rises? Modeling the magnitude of five-day downside risk for AAPL, MSFT, NVDA, GOOG, and AMZN.</p>
+    <p class="standfirst">Are short-term stock drops unpredictable, or do measurable signals appear before downside risk rises? Modeling the magnitude of five-day downside risk for AAPL, MSFT, NVDA, GOOG, and AMZN — and finding that a linear model beat both ensembles tested against it.</p>
 
     <div class="ledger"><span><span class="k">R&sup2;</span> <span class="v">0.526</span></span><span><span class="k">MEAN ERROR</span> <span class="v">&plusmn;1.4pp</span></span><span><span class="k">WINDOW</span> <span class="v neg">5-DAY DOWNSIDE</span></span><span><span class="k">STACK</span> <span class="v">Python &middot; pandas &middot; scikit-learn</span></span></div>
 
@@ -37,73 +37,145 @@
 
 
     <h2>The anxiety of the unknown drop</h2>
-    <p>Most people treat the stock market as a guess about direction — up or down. For an
-      everyday investor, the sharper fear isn't a missed gain, it's the sudden decline that
-      erases months of savings. This project asks whether that decline is visible before it
-      happens.</p>
-    <p>The research question: are short-term stock drops genuinely unpredictable, or are
-      there measurable signals that appear before downside risk rises? We modeled the
-      magnitude of downside risk — the maximum percentage a stock might fall over a
-      five-day window — for five large-cap technology names: Apple, Microsoft, Nvidia,
-      Google, and Amazon.</p>
+    <p>Most people treat the stock market as a guess about direction — will it go up or
+      down. For an everyday investor, the sharper fear isn't a missed gain. It's the sudden
+      decline that erases months of savings before there's time to react.</p>
+    <p>Direction is the wrong thing to model for that fear. Knowing a stock will probably
+      close lower says nothing about whether it drops half a percent or twelve. What matters
+      to someone holding the position is <em>magnitude</em> — how far down the floor is.</p>
+    <p>So the research question wasn't "will this go down." It was: are short-term drops
+      genuinely unpredictable, or are there measurable signals that appear before downside
+      risk rises? We defined the target as the maximum percentage a stock might fall over a
+      forward five-day window, and modeled that magnitude directly for five large-cap
+      technology names: Apple, Microsoft, Nvidia, Google, and Amazon.</p>
 
     <figure>
       <img src="../assets/stock-01-risk-distribution.png" alt="Distribution of daily returns, showing a left tail of sharp declines">
-      <figcaption>Most daily movements are small. The left tail holds the rare, sharp declines the model targets.</figcaption>
+      <figcaption>The distribution of daily movement. Most days cluster near zero; the left tail holds the rare, sharp declines the model is built to anticipate.</figcaption>
     </figure>
+
+    <p>That distribution is the whole problem in one chart. The bulk of the data is
+      uninformative noise, and the events worth predicting sit in a thin tail. Any model
+      that optimizes for the average day will fit the noise and ignore the tail.</p>
+
+    <h2>Data and target construction</h2>
+    <p>Price data came through the Alpha Vantage API for the five tickers, joined against
+      quarterly earnings for the same companies. The choice of five liquid, heavily-traded
+      large-caps was deliberate: it holds sector and liquidity roughly constant, so any
+      signal the model finds is more likely to be about market conditions than about
+      idiosyncratic differences between companies.</p>
+    <p>The target is forward-looking by construction. For each trading day, downside risk is
+      the largest percentage decline realized over the following five sessions. That means
+      every feature has to be computable from information available <em>at</em> that day —
+      no lookahead, or the model learns to read the answer.</p>
 
     <h2>Building the warning system</h2>
     <p>Rather than watching price alone, we built a multivariate feature pipeline across
-      three families of signal:</p>
+      three families of signal, each answering a different question about market state:</p>
     <ul>
-      <li><strong>Momentum</strong> — RSI and MACD, tracking how fast price is moving.</li>
-      <li><strong>Volatility</strong> — Bollinger Bands and rolling standard deviation, measuring instability.</li>
-      <li><strong>Fundamentals</strong> — quarterly earnings, testing whether company value supported the price.</li>
+      <li><strong>Momentum — how fast is price moving?</strong> RSI and MACD. The premise is
+        that a name which has run up quickly has further to fall, and that momentum
+        exhaustion precedes reversals.</li>
+      <li><strong>Volatility — how unstable is the environment?</strong> Bollinger Band width
+        and rolling standard deviation. Wider bands mean the market is already moving in
+        larger increments, which mechanically raises the size of a plausible drop.</li>
+      <li><strong>Fundamentals — does the price have support?</strong> Quarterly earnings,
+        integrated to test whether company value backed the price level or whether the stock
+        had detached from it.</li>
     </ul>
 
     <figure>
       <img src="../assets/stock-02-feature-heatmap.png" alt="Correlation heatmap of engineered features against downside risk">
-      <figcaption>Feature correlation heatmap — which market signals track most closely with price drops.</figcaption>
+      <figcaption>Feature correlation heatmap. Used to see which signals track downside risk and, just as importantly, which track each other closely enough to be redundant.</figcaption>
     </figure>
 
+    <p>The heatmap did double duty. It showed which features carried signal against the
+      target, and it exposed the volatility measures as heavily correlated with one another
+      — they describe the same underlying condition through different arithmetic. Knowing
+      that mattered when interpreting coefficients later.</p>
+
     <h2>Simplicity wins</h2>
-    <p>We tested two ensemble methods against a linear baseline. Random forest averages
-      hundreds of decision trees to stabilize its prediction. Gradient boosting builds
-      models in sequence, each one correcting the errors of the last.</p>
-    <p>Both were outperformed by linear regression. While the ensembles searched for
-      intricate interactions, a straight-line relationship between the technical indicators
-      and forward downside risk turned out to carry most of the available signal.</p>
+    <p>The expectation going in was that ensemble methods would win. Downside risk sounds
+      like the kind of thing that should hide in interactions — a specific combination of
+      overbought momentum <em>and</em> expanding volatility <em>and</em> weak earnings, rather
+      than any one of them alone. Two models were tested against a linear baseline on that
+      assumption:</p>
+    <ul>
+      <li><strong>Random forest</strong> — builds hundreds of decision trees on resampled
+        data and averages them, which stabilizes predictions and captures non-linear
+        splits a single tree would overfit.</li>
+      <li><strong>Gradient boosting</strong> — builds models in sequence, each one trained
+        specifically on the errors the previous one made, so the ensemble concentrates
+        effort where it's currently wrong.</li>
+    </ul>
+    <p>Both lost to linear regression.</p>
 
     <figure>
       <img src="../assets/stock-03-predicted-vs-actual.png" alt="Scatter of predicted versus actual downside risk">
-      <figcaption>Predicted vs. actual downside risk. The linear trend indicates the model tracked drop magnitude, not just direction.</figcaption>
+      <figcaption>Predicted vs. actual downside risk. The linear trend indicates the model tracked the size of the drop, not merely its direction.</figcaption>
     </figure>
 
-    <p>The best model reached an R&sup2; of 0.526 — accounting for 52.6% of the variance in
-      short-term downside risk — with predictions typically landing within 1.4 percentage
-      points of the realized figure.</p>
+    <p>The best model reached an <strong>R&sup2; of 0.526</strong> — accounting for 52.6% of
+      the variance in short-term downside risk — with predictions typically landing within
+      <strong>1.4 percentage points</strong> of the realized figure. For a five-day forward
+      window on public technical indicators, that's a meaningful share of a quantity usually
+      described as unforecastable.</p>
 
     <figure>
       <img src="../assets/stock-04-model-comparison.png" alt="Table comparing model performance across algorithms and feature sets">
-      <figcaption>Model comparison across algorithms and feature sets. Linear regression on the full feature set was the most reliable.</figcaption>
+      <figcaption>Model comparison across algorithms and feature sets. Linear regression on the full feature set was the most reliable configuration tested.</figcaption>
     </figure>
+
+    <h2>Why the simple model won</h2>
+    <p>The result is worth sitting with rather than filing as a curiosity. A plausible
+      reading: the relationship between volatility state and forward downside magnitude is
+      close to genuinely linear. Wider bands and higher realized volatility imply larger
+      moves in both directions, and the size of the plausible drop scales with that more or
+      less proportionally. There isn't an intricate interaction to find, so the models
+      searching for one had nothing to gain and additional variance to lose.</p>
+    <p>The ensembles had more capacity to fit noise in a dataset where most observations are
+      ordinary days. Extra flexibility is only an advantage when there's structure to
+      flex toward.</p>
+    <p>The practical consequence is that the winning model is also the interpretable one.
+      Each coefficient states how much forward downside risk moves per unit of its
+      indicator. That is not a small thing when the output is meant to warn someone about
+      their own money.</p>
 
     <h2>Why the result matters</h2>
     <p>Risk modeling of this kind usually sits inside a black box, where the reasoning
       behind a prediction is invisible to the person affected by it. A transparent linear
-      model built on publicly available indicators — moving averages, RSI, volatility
-      bands, volume behavior — is a plausible blueprint for a warning-light system a retail
-      investor could actually inspect.</p>
-    <p>Two limits are worth stating plainly. First, a feedback loop: if enough investors act
-      on the same warning signal, the coordinated sell-off contributes to the decline the
-      model was built to anticipate. Second, information inequality: the code is open, but
-      the high-frequency data feeds needed to run this live are not cheap, which pushes the
-      practical benefit toward whoever can already afford the infrastructure.</p>
+      model built on publicly available indicators — moving averages, RSI, volatility bands,
+      volume behavior — is a plausible blueprint for a warning-light system that a retail
+      investor could actually inspect and disagree with.</p>
+
+    <h3>Where it breaks</h3>
+    <p>Three limits worth stating plainly.</p>
+    <p><strong>Feedback loops.</strong> If enough investors act on the same warning signal,
+      the coordinated sell-off contributes to the decline the model was built to anticipate.
+      A widely-adopted forecast changes the system it forecasts — the model's accuracy and
+      its adoption are not independent.</p>
+    <p><strong>Information inequality.</strong> The code is open; the high-frequency data
+      feeds needed to run this live are not cheap. If only well-capitalized participants can
+      afford the infrastructure, a tool framed as protective for retail investors ends up
+      benefiting whoever already had the advantage.</p>
+    <p><strong>Regime dependence.</strong> Five large-cap technology names over a finite
+      window is a narrow slice. The linear relationship that held here was fit in a
+      particular volatility regime, and the honest expectation is that it degrades in a
+      crisis — precisely the condition where downside prediction would matter most. Testing
+      across sectors and across a market dislocation is the obvious next step.</p>
+
+    <h2>What I took from it</h2>
+    <p>Two things. First, that model complexity is a hypothesis about the data, not a
+      default setting — reaching for gradient boosting encodes a belief that the structure
+      is non-linear, and that belief should be tested rather than assumed. Second, that in a
+      financial context the interpretable model has value the accuracy metric doesn't
+      capture. A number a person can trace back to a cause is worth more than a marginally
+      better number they can't.</p>
 
     <h2>Data and tooling</h2>
     <p>Price and fundamentals data via the Alpha Vantage API. Python, pandas, and
-      scikit-learn for feature engineering and modeling. AI tools were used for feature
-      engineering approaches and editing.</p>
+      scikit-learn for feature engineering and modeling. AI tools were used to explore
+      feature engineering approaches and to check the writing for clarity.</p>
 
     <a class="backlink" href="../index.html#work">&#8592; All projects</a>
   </div>
